@@ -112,8 +112,28 @@ def _load_next(data_config, filelist, load_range, options):
     load_branches = data_config.train_load_branches if options['training'] else data_config.test_load_branches
     table = _read_files(filelist, load_branches, load_range, treename=data_config.treename,
                         branch_magic=data_config.branch_magic, file_magic=data_config.file_magic)
+    table = get_custom_feature(table)
     table, indices = _preprocess(table, data_config, options)
     return table, indices
+    
+def get_custom_feature(table):
+    try:
+        length = len(table['part_pt']) 
+        part_logptrel_res = []
+        for i in range(0, length):
+            curr_feature_res1 = [] 
+            init_flag = table['part_jetid '][i][0]
+            jet_index = 0
+            for j in range(0, len(table['part_pt '][i])):
+                if table['part_jetid '][i][j] != init_flag:
+                    jet_index += 1  
+                    init_flag = table['part_jetid '][i][j]
+                new_value1 = table['part_pt'][i][j] / table['jet_pt'][i][jet_index]
+                curr_feature_res1.append(new_value1)
+            part_logptrel_res.append(curr_feature_res1)
+        table['part_logptrel'] = part_logptrel_res 
+    except:
+        raise ValueError("error！")
 
 
 class _SimpleIter(object):
