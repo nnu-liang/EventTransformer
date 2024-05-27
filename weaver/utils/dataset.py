@@ -118,22 +118,52 @@ def _load_next(data_config, filelist, load_range, options):
     
 def get_custom_feature(table):
     try:
-        length = len(table['part_pt']) 
+        length = len(table['test_part_pt']) 
         part_logptrel_res = []
         for i in range(0, length):
             curr_feature_res1 = [] 
-            init_flag = table['part_jetid '][i][0]
+            init_flag = table['test_part_jetid '][i][0]
             jet_index = 0
-            for j in range(0, len(table['part_pt '][i])):
-                if table['part_jetid '][i][j] != init_flag:
+            for j in range(0, len(table['test_part_pt '][i])):
+                if table['test_part_jetid '][i][j] != init_flag:
                     jet_index += 1  
-                    init_flag = table['part_jetid '][i][j]
-                new_value1 = table['part_pt'][i][j] / table['jet_pt'][i][jet_index]
+                    init_flag = table['test_part_jetid '][i][j]
+                new_value1 = table['test_part_pt'][i][j] / table['test_jet_pt'][i][jet_index]
                 curr_feature_res1.append(new_value1)
             part_logptrel_res.append(curr_feature_res1)
         table['part_logptrel'] = part_logptrel_res 
+    try:
+        length = len(table['test_part_energy'])  
+        part_logerel_res = []
+        for i in range(0, length):
+            curr_feature_res2 = [] 
+            init_flag = table['test_part_jetid'][i][0]  
+            jet_index = 0
+            for j in range(0, len(table['test_part_energy'][i])):
+                if table['test_part_jetid'][i][j] != init_flag:  
+                    jet_index += 1  
+                    init_flag = table['test_part_jetid'][i][j]
+                new_value2 = table['test_part_energy'][i][j] / table['test_jet_pt'][i][jet_index]
+                curr_feature_res2.append(new_value2)
+            part_logerel_res.append(curr_feature_res2)
+        table['part_logerel'] = part_logerel_res  
+    try:
+        length = len(table['test_jet_phi'])
+        jet_deltaR_res = []
+        for i in range(0, length):
+            curr_jet_numbers = int(table['jet_numbers'][i]) 
+            curr_feature_res3 = [] 
+            for j in range(curr_jet_numbers - 1):
+                for k in range(j + 1, curr_jet_numbers):
+                    delta_phi = table['test_jet_phi'][i][j] - table['test_jet_phi'][i][k]
+                    delta_eta = table['test_jet_eta'][i][j] - table['test_jet_eta'][i][k]
+                    delta_R = np.hypot(delta_eta, delta_phi)
+                    curr_feature_res3.append(delta_R)
+            jet_deltaR_res.append(curr_feature_res3)
+        table['jet_deltaR'] = jet_deltaR_res 
     except:
         raise ValueError("error！")
+    return(table)
 
 
 class _SimpleIter(object):
