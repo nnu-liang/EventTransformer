@@ -1,4 +1,6 @@
 import os
+import sys
+sys.path.append(os.getcwd())
 import copy
 import json
 import numpy as np
@@ -132,6 +134,8 @@ def get_custom_feature(table):
                 curr_feature_res1.append(new_value1)
             part_logptrel_res.append(curr_feature_res1)
         table['part_logptrel'] = part_logptrel_res 
+    except:
+        raise ValueError("error！")
     try:
         length = len(table['test_part_energy'])  
         part_logerel_res = []
@@ -143,10 +147,12 @@ def get_custom_feature(table):
                 if table['test_part_jetid'][i][j] != init_flag:  
                     jet_index += 1  
                     init_flag = table['test_part_jetid'][i][j]
-                new_value2 = table['test_part_energy'][i][j] / table['test_jet_pt'][i][jet_index]
+                new_value2 = table['test_part_energy'][i][j] / table['test_jet_energy'][i][jet_index]
                 curr_feature_res2.append(new_value2)
             part_logerel_res.append(curr_feature_res2)
         table['part_logerel'] = part_logerel_res  
+    except:
+        raise ValueError("error！")
     try:
         length = len(table['test_jet_phi'])
         jet_deltaR_res = []

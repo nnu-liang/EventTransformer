@@ -3,6 +3,7 @@
 import os
 import ast
 import sys
+sys.path.append(os.getcwd())
 import shutil
 import glob
 import argparse
