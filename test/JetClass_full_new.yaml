@@ -10,11 +10,16 @@ new_variables:
    part_pt: np.hypot(part_px, part_py)
    part_pt_log: np.log(part_pt)
    part_e_log: np.log(part_energy)
-   #part_logptrel:
-   #part_logerel: np.log(part_energy/jet_energy)
-   part_deltaR: np.hypot(part_deta, part_dphi)
    part_d0: np.tanh(part_d0val)
    part_dz: np.tanh(part_dzval)
+   
+   jet_pt_log: np.log(jet_pt)
+   jet_px_log: np.log(jet_px)
+   jet_py_log: np.log(jet_py)
+   jet_pz_log: np.log(jet_pz)
+   jet_energy_log: np.log(jet_energy)
+   jet_nparticles_log: np.log(jet_nparticles)
+   
 
 preprocess:
   ### method: [manual, auto] - whether to use manually specified parameters for variable standardization
@@ -26,9 +31,9 @@ inputs:
    pf_points:
       length: 128
       pad_mode: wrap
-      vars: 
-         - [part_deta, null]
-         - [part_dphi, null]
+      vars:
+         - [part_dEta_two_partciles, null]
+         - [part_dPhi_two_particles, null]
    pf_features:
       length: 128
       pad_mode: wrap
@@ -42,10 +47,7 @@ inputs:
       ###              pad_value(optional, default=0)]
          - [part_pt_log, 1.7, 0.7]
          - [part_e_log, 2.0, 0.7]
-         - [part_logptrel, -4.7, 0.7]
-         - [part_logerel, -4.7, 0.7]
-         - [part_deltaR, 0.2, 4.0]
-         - [jet_deltaR, null]
+         - [part_dR_two_particle, null]
          - [part_charge, null]
          - [part_isChargedHadron, null]
          - [part_isNeutralHadron, null]
@@ -56,9 +58,56 @@ inputs:
          - [part_d0err, 0, 1, 0, 1]
          - [part_dz, null]
          - [part_dzerr, 0, 1, 0, 1]
-         - [part_deta, null]
-         - [part_dphi, null]
+         - [part_slimjetid, null]
+         - [part_fatjetid, null]
          
+         - [jet_pt_log, null]
+         - [jet_px_log, null]
+         - [jet_py_log, null]
+         - [jet_pz_log, null]
+         - [jet_energy_log, null]
+         - [jet_sdmass, null]
+         - [jet_nparticles_log, null]
+         - [jet_ncharged, null]
+         - [jet_nneutral, null]
+         - [jet_NeutralEnergyFraction, null]
+         - [jet_ChargedEnergyFraction, null]
+         - [jet_tau1, null]
+         - [jet_tau2, null]
+         - [jet_tau3, null]
+         - [jet_tau4, null]
+         - [jet_antikt_dR, null]
+         
+         - [event_px, null]
+         - [event_py, null]
+         - [event_pz, null]
+         - [event_pt, null]
+         - [event_energy, null]
+         - [event_nparticles, null]
+         - [event_njets, null]
+         
+         - [jet_dEta_two_jets, null]
+         - [jet_dPhi_two_jets, null]
+         - [jet_dR_two_jets, null]
+         
+         - [part_logptrel_particle_jet, null]
+         - [part_logerel_particle_jet, null]
+         - [part_dEta_particle_jet, null]
+         - [part_dPhi_particle_jet, null]
+         - [part_dR_particle_jet, null]
+         
+         - [jet_log_ptrel_jet_event, null]
+         - [jet_log_erel_jet_event, null]
+         - [jet_dEta_jet_event, null]
+         - [jet_dPhi_jet_event, null]
+         - [jet_dR_jet_event, null]
+         
+         - [jet_log_ptrel_jet_event , null]
+         - [jet_log_erel_jet_event, null]
+         - [jet_dEta_jet_event, null]
+         - [jet_dPhi_jet_event, null]
+         - [jet_dR_jet_event, null]
+                  
    pf_vectors:
       length: 128
       pad_mode: wrap
@@ -78,7 +127,7 @@ labels:
    ### type can be `simple`, `custom`
    ### [option 1] use `simple` for binary/multi-class classification, then `value` is a list of 0-1 labels
    type: simple
-   value: [label_QCD, label_Hbb, label_Hcc, label_Hgg, label_H4q, label_Hqql, label_Zqq, label_Wqq, label_Tbqq, label_Tbl]
+   value: [label_hh_4b, label_tth_4b4j, label_ttbb_4b4j, label_hbb_4b, label_4b, label_2b2j]
    ### [option 2] otherwise use `custom` to define the label, then `value` is a map
    # type: custom
    # value: 
@@ -96,12 +145,16 @@ observers:
    #- jet_tau3
    #- jet_tau4
 monitor_variables:
-   - test_part_pt
-   - test_part_jetid
-   - test_jet_pt
-   - test_jet_phi
-   - test_jet_eta
-   - test_part_energy
-   - test_jet_energy
-   - jet_numbers
+   - part_eta
+   - part_phi
+   - part_pt
+   - part_energy
+   - jet_eta
+   - jet_phi
+   - jet_pt
+   - jet_energy
+   - event_pt
+   - event_energy
+   - event_eta
+   - event_phi
 weights:
