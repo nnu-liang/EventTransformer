@@ -9,9 +9,9 @@ def _load_next(data_config, filelist, load_range, options):
 
 def get_custom_feature(table):
     table['part_dEta_two_particles '] = get_two_fea(table['part_eta'])
-    table['part_dPhi_two_particles'] = get_two_fea(table['part_phi'])
+    table['part_dPhi_two_particles'] = get_dPhi(table['part_phi'])
     table['jet_dEta_two_jets'] = get_two_fea(table['jet_eta'])
-    table['jet_dPhi_two_jets'] = get_two_fea(table['jet_phi'])
+    table['jet_dPhi_two_jets'] = get_dPhi(table['jet_phi'])
     table['part_dR_two_particles'] = get_squares_sum(table['part_dEta_two_particles'], table['part_dPhi_two_particles'])
     table['jet_dR_two_jets'] = get_squares_sum(table['jet_dEta_two_jets'], table['jet_dPhi_two_jets'])
     table['part_logptrel_particle_jet'] = get_jet_fea(
@@ -20,7 +20,7 @@ def get_custom_feature(table):
         table['part_energy'], table['jet_energy'], table['particle_slimjetid'], table['particle_fatjetid'])
     table['part_dEta_particle_jet'] = get_two_fea(get_jet_fea(
         table['part_eta'], table['jet_eta'], table['particle_slimjetid'], table['particle_fatjetid']))
-    table['part_dPhi_particle_jet'] = get_two_fea(get_jet_fea(
+    table['part_dPhi_particle_jet'] = get_dPhi(get_jet_fea(
         table['part_phi'], table['jet_phi'], table['particle_slimjetid'], table['particle_fatjetid']))
     table['part_dR_particle_jet'] = get_squares_sum(table['part_dEta_particle_jet'], table['part_dPhi_particle_jet'])
 
@@ -29,9 +29,9 @@ def get_custom_feature(table):
     table['jet_logptrel_jet_event'] = get_event_fea(table['jet_pt'], table['event_pt'])
     table['jet_logerel_jet_event'] = get_event_fea(table['jet_energy'], table['event_energy'])
     table['part_dEta_particle_event'] = get_two_fea(get_event_fea(table['part_eta'], table['event_eta']))
-    table['part_dPhi_particle_event'] = get_two_fea(get_event_fea(table['part_phi'], table['event_phi']))
+    table['part_dPhi_particle_event'] = get_dPhi(get_event_fea(table['part_phi'], table['event_phi']))
     table['jet_dEta_jet_event'] = get_two_fea(get_event_fea(table['jet_eta'], table['event_eta']))
-    table['jet_dPhi_jet_event'] = get_two_fea(get_event_fea(table['jet_phi'], table['event_phi']))
+    table['jet_dPhi_jet_event'] = get_dPhi(get_event_fea(table['jet_phi'], table['event_phi']))
 
     table['part_dR_particle_event'] = get_squares_sum(
         table['part_dEta_particle_event'], table['part_dPhi_particle_event'])
@@ -111,3 +111,21 @@ def get_pair_res(slimjet_id, fatjet_id):
             res[curr_id] = [index]
     sorted_res = sorted(res.items(), key=lambda x: x[0])
     return sorted_res
+    
+    
+def get_dPhi(input_features):
+    length = len(input_features) 
+    result = []
+    for i in range(0, length):
+        curr_sample_len = len(input_features[i]) 
+        curr_res = [] 
+        for j in range(curr_sample_len - 1):
+            for k in range(j + 1, curr_sample_len):
+                new_value = input_features[i][j] - input_features[i][k] 
+                while new_value > math.pi:
+                    new_value -= 2 * math.pi
+                while new_value < -math.pi:
+                    new_value += 2 * math.pi
+                curr_res.append(new_value)
+        result.append(curr_res)
+    return result
