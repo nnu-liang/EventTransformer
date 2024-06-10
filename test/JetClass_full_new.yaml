@@ -7,7 +7,7 @@ new_variables:
    ### [format] name: formula
    ### can use functions from `math`, `np` (numpy), and `awkward` in the expression
    part_mask: ak.ones_like(part_energy)
-   part_pt: np.hypot(part_px, part_py)
+  # part_pt: np.hypot(part_px, part_py)
    part_pt_log: np.log(part_pt)
    part_e_log: np.log(part_energy)
    part_d0: np.tanh(part_d0val)
@@ -32,8 +32,8 @@ inputs:
       length: 128
       pad_mode: wrap
       vars:
-         - [part_dEta_two_partciles, null]
-         - [part_dPhi_two_particles, null]
+         - [part_dEta_particle_jet, null]
+         - [part_dPhi_particle_jet, null]
    pf_features:
       length: 128
       pad_mode: wrap
@@ -47,7 +47,7 @@ inputs:
       ###              pad_value(optional, default=0)]
          - [part_pt_log, 1.7, 0.7]
          - [part_e_log, 2.0, 0.7]
-         - [part_dR_two_particle, null]
+#         - [part_dR_two_particle, null]
          - [part_charge, null]
          - [part_isChargedHadron, null]
          - [part_isNeutralHadron, null]
@@ -70,8 +70,8 @@ inputs:
          - [jet_nparticles_log, null]
          - [jet_ncharged, null]
          - [jet_nneutral, null]
-         - [jet_NeutralEnergyFraction, null]
-         - [jet_ChargedEnergyFraction, null]
+         - [jet_neutralEnergyfraction, null]
+         - [jet_chargedEnergyfraction, null]
          - [jet_tau1, null]
          - [jet_tau2, null]
          - [jet_tau3, null]
@@ -102,11 +102,11 @@ inputs:
          - [jet_dPhi_jet_event, null]
          - [jet_dR_jet_event, null]
          
-         - [jet_log_ptrel_jet_event , null]
-         - [jet_log_erel_jet_event, null]
-         - [jet_dEta_jet_event, null]
-         - [jet_dPhi_jet_event, null]
-         - [jet_dR_jet_event, null]
+         - [part_logptrel_particle_event , null]
+         - [part_logerel_particle_event, null]
+         - [part_dEta_particle_event, null]
+         - [part_dPhi_particle_event, null]
+         - [part_dR_particle_event, null]
                   
    pf_vectors:
       length: 128
@@ -157,4 +157,6 @@ monitor_variables:
    - event_energy
    - event_eta
    - event_phi
+   - part_slimjetid
+   - part_fatjetid
 weights:

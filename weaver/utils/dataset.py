@@ -119,57 +119,169 @@ def _load_next(data_config, filelist, load_range, options):
     return table, indices
     
 def get_custom_feature(table):
-    try:
-        length = len(table['test_part_pt']) 
-        part_logptrel_res = []
-        for i in range(0, length):
-            curr_feature_res1 = [] 
-            init_flag = table['test_part_jetid '][i][0]
-            jet_index = 0
-            for j in range(0, len(table['test_part_pt '][i])):
-                if table['test_part_jetid '][i][j] != init_flag:
-                    jet_index += 1  
-                    init_flag = table['test_part_jetid '][i][j]
-                new_value1 = table['test_part_pt'][i][j] / table['test_jet_pt'][i][jet_index]
-                curr_feature_res1.append(new_value1)
-            part_logptrel_res.append(curr_feature_res1)
-        table['part_logptrel'] = part_logptrel_res 
-    except:
-        raise ValueError("error！")
-    try:
-        length = len(table['test_part_energy'])  
-        part_logerel_res = []
-        for i in range(0, length):
-            curr_feature_res2 = [] 
-            init_flag = table['test_part_jetid'][i][0]  
-            jet_index = 0
-            for j in range(0, len(table['test_part_energy'][i])):
-                if table['test_part_jetid'][i][j] != init_flag:  
-                    jet_index += 1  
-                    init_flag = table['test_part_jetid'][i][j]
-                new_value2 = table['test_part_energy'][i][j] / table['test_jet_energy'][i][jet_index]
-                curr_feature_res2.append(new_value2)
-            part_logerel_res.append(curr_feature_res2)
-        table['part_logerel'] = part_logerel_res  
-    except:
-        raise ValueError("error！")
-    try:
-        length = len(table['test_jet_phi'])
-        jet_deltaR_res = []
-        for i in range(0, length):
-            curr_jet_numbers = int(table['jet_numbers'][i]) 
-            curr_feature_res3 = [] 
-            for j in range(curr_jet_numbers - 1):
-                for k in range(j + 1, curr_jet_numbers):
-                    delta_phi = table['test_jet_phi'][i][j] - table['test_jet_phi'][i][k]
-                    delta_eta = table['test_jet_eta'][i][j] - table['test_jet_eta'][i][k]
-                    delta_R = np.hypot(delta_eta, delta_phi)
-                    curr_feature_res3.append(delta_R)
-            jet_deltaR_res.append(curr_feature_res3)
-        table['jet_deltaR'] = jet_deltaR_res 
-    except:
-        raise ValueError("error！")
-    return(table)
+
+    #print(table.fields)
+        
+#    table['part_dEta_two_particles'] = get_two_fea(table['part_eta'])
+#    table['part_dPhi_two_particles'] = get_dPhi(table['part_phi'])
+    table['jet_dEta_two_jets'] = get_two_fea(table['jet_eta'])
+    table['jet_dPhi_two_jets'] = get_dPhi(table['jet_phi'])
+#    table['part_dR_two_particles'] = get_squares_sum(table['part_dEta_two_particles'], table['part_dPhi_two_particles'])
+    table['jet_dR_two_jets'] = get_squares_sum(table['jet_dEta_two_jets'], table['jet_dPhi_two_jets'])
+    table['part_logptrel_particle_jet'] = get_jet_fea(
+        table['part_pt'], table['jet_pt'], table['part_slimjetid'], table['part_fatjetid'])
+    table['part_logerel_particle_jet'] = get_jet_fea(
+        table['part_energy'], table['jet_energy'], table['part_slimjetid'], table['part_fatjetid'])
+    table['part_dEta_particle_jet'] = get_two_fea(get_jet_fea(
+        table['part_eta'], table['jet_eta'], table['part_slimjetid'], table['part_fatjetid'], is_log=False))
+    table['part_dPhi_particle_jet'] = get_dPhi(get_jet_fea(
+        table['part_phi'], table['jet_phi'], table['part_slimjetid'], table['part_fatjetid'], is_log=False))
+    table['part_dR_particle_jet'] = get_squares_sum(table['part_dEta_particle_jet'], table['part_dPhi_particle_jet'])
+
+    table['part_logptrel_particle_event'] = get_event_fea(table['part_pt'], table['event_pt'])
+    table['part_logerel_particle_event'] = get_event_fea(table['part_energy'], table['event_energy'])
+    table['jet_logptrel_jet_event'] = get_event_fea(table['jet_pt'], table['event_pt'])
+    table['jet_logerel_jet_event'] = get_event_fea(table['jet_energy'], table['event_energy'])
+    table['part_dEta_particle_event'] = get_two_fea(get_event_fea(table['part_eta'], table['event_eta'], is_log=False))
+    table['part_dPhi_particle_event'] = get_dPhi(get_event_fea(table['part_phi'], table['event_phi'], is_log=False))
+    table['jet_dEta_jet_event'] = get_two_fea(get_event_fea(table['jet_eta'], table['event_eta'], is_log=False))
+    table['jet_dPhi_jet_event'] = get_dPhi(get_event_fea(table['jet_phi'], table['event_phi'], is_log=False))
+
+    table['part_dR_particle_event'] = get_squares_sum(
+        table['part_dEta_particle_event'], table['part_dPhi_particle_event'])
+    table['jet_dR_jet_event'] = get_squares_sum(
+        table['jet_dEta_jet_event'], table['jet_dPhi_jet_event'])
+    
+    # 将数值转化为一维向量,要将yaml文件中input输入特征中的float转化为向量
+    table['event_px'] = add_axis(table['event_px'])
+    table['event_py'] = add_axis(table['event_py'])
+    table['event_pz'] = add_axis(table['event_pz'])
+    table['event_pt'] = add_axis(table['event_pt'])
+    table['event_energy'] = add_axis(table['event_energy'])
+    table['event_nparticles'] = add_axis(table['event_nparticles'])
+    table['event_njets'] = add_axis(table['event_njets'])
+    print("New value compute finished!")
+    return table
+
+
+def get_two_fea(input_features):
+    length = len(input_features) 
+    result = []
+    for i in range(0, length):
+        curr_sample_len = len(input_features[i]) 
+        curr_res = [] 
+        for j in range(curr_sample_len - 1):
+            for k in range(j + 1, curr_sample_len):
+                new_value = input_features[i][j] - input_features[i][k] 
+                curr_res.append(new_value)
+        result.append(curr_res)
+    return result
+
+
+def get_squares_sum(features1, features2):
+    length = len(features1)  
+    result = []
+    for i in range(0, length):
+        curr_sample_len = len(features1[i])  
+        curr_res = []  
+        for j in range(curr_sample_len):
+            curr_res.append(math.sqrt(math.pow(features1[i][j], 2) + math.pow(features2[i][j], 2)))
+        result.append(curr_res)
+    return result
+
+
+def get_jet_fea(part_features, jet_features, slimjet_ids, fatjet_ids, is_log=True):
+    length = len(part_features)  
+    result = []
+    for i in range(0, length):
+        curr_result = []  
+        id2indexs = get_pair_res(slimjet_ids[i], fatjet_ids[i])
+        for curr_id, index_list in id2indexs:
+            for curr_index in index_list:
+               # try:
+                if is_log:
+
+                    curr_result.append(
+                       #math.log(math.fabs(part_features[i][curr_index]) / math.fabs(jet_features[i][curr_id])))
+                       math.log(part_features[i][curr_index] / jet_features[i][curr_id]))
+                else:
+                    curr_result.append(
+                       part_features[i][curr_index] / jet_features[i][curr_id])
+                #except:
+                 #   print("***")
+                  #  print(part_features[i][curr_index])
+                   # print(jet_features[i][curr_id]) 
+                    #raise ValueError("Table does not contain 'part_eta' field")
+
+        result.append(curr_result)
+    return result
+
+
+def get_event_fea(data_features, event_features, is_log=True):
+    length = len(data_features)  
+    result = []
+    for i in range(0, length):
+        curr_sample_len = len(data_features[i])  
+        curr_result = []  
+        for j in range(curr_sample_len):
+            if is_log:
+                curr_result.append(
+                    math.log(data_features[i][j] / event_features[i]))  
+            else:
+                curr_result.append(
+                    data_features[i][j] / event_features[i])
+        result.append(curr_result)
+    return result
+
+
+def get_pair_res(slimjet_id, fatjet_id):
+    res = {}
+    for index, curr_id in enumerate(slimjet_id):
+        if curr_id == 0:
+            continue
+        if curr_id in res:
+            res[curr_id].append(index)
+        else:
+            res[curr_id] = [index]
+    for index, curr_id in enumerate(fatjet_id):
+        if curr_id == 0:
+            continue
+        if curr_id in res:
+            res[curr_id].append(index)
+        else:
+            res[curr_id] = [index]
+    sorted_res = sorted(res.items(), key=lambda x: x[0])
+    return sorted_res
+    
+    
+def get_dPhi(input_features):
+    length = len(input_features) 
+    result = []
+    for i in range(0, length):
+        curr_sample_len = len(input_features[i]) 
+        curr_res = [] 
+        for j in range(curr_sample_len - 1):
+            for k in range(j + 1, curr_sample_len):
+                new_value = input_features[i][j] - input_features[i][k] 
+                if new_value >= math.pi:
+                    new_value -= math.floor((new_value + math.pi) / 2 * math.pi) * 2 * math.pi
+                while new_value < -math.pi:
+                    new_value += 2 * math.pi
+                curr_res.append(new_value)
+        result.append(curr_res)
+    return result
+
+
+def add_axis(features):
+    result = []
+    for i in range(len(features)):
+        # try:
+        #     assert features[i] is not list
+        # except:
+        #     raise ValueError("Except event value is a number but get list!")
+        result.append([features[i]])
+    return result
+
 
 
 class _SimpleIter(object):
