@@ -19,6 +19,16 @@ new_variables:
    jet_pz_log: np.log(jet_pz)
    jet_energy_log: np.log(jet_energy)
    jet_nparticles_log: np.log(jet_nparticles)
+   jet_dR_two_jets: np.hypot(jet_dEta_two_jets, jet_dPhi_two_jets)
+   jet_dR_jet_event: np.hypot(jet_dEta_jet_event, jet_dPhi_jet_event)
+   part_dR_particle_jet: np.hypot(part_dEta_particle_jet, part_dPhi_particle_jet)
+   part_dR_particle_event: np.hypot(part_dEta_particle_event, part_dPhi_particle_event)
+   part_logptrel_particle_jet: np.log(part_ptrel_particle_jet)
+   part_logerel_particle_jet: np.log(part_erel_particle_jet)
+   jet_logptrel_jet_event: np.log(jet_ptrel_jet_event)
+   jet_logerel_jet_event: np.log(jet_erel_jet_event)
+   part_logptrel_particle_event: np.log(part_ptrel_particle_event)
+   part_logerel_particle_event: np.log(part_erel_particle_event)
    
 
 preprocess:
@@ -29,13 +39,13 @@ preprocess:
 
 inputs:
    pf_points:
-      length: 128
+      length: 350
       pad_mode: wrap
       vars:
          - [part_dEta_particle_jet, null]
          - [part_dPhi_particle_jet, null]
    pf_features:
-      length: 128
+      length: 350
       pad_mode: wrap
       vars: 
       ### [format 1]: var_name (no transformation)
@@ -47,7 +57,6 @@ inputs:
       ###              pad_value(optional, default=0)]
          - [part_pt_log, 1.7, 0.7]
          - [part_e_log, 2.0, 0.7]
-#         - [part_dR_two_particle, null]
          - [part_charge, null]
          - [part_isChargedHadron, null]
          - [part_isNeutralHadron, null]
@@ -107,9 +116,15 @@ inputs:
          - [part_dEta_particle_event, null]
          - [part_dPhi_particle_event, null]
          - [part_dR_particle_event, null]
+         
+         - [jet_ration_nslimjet_nfatjet, null]
+         - [jet_ptrel_slimjet_fatjet, null]
+         - [jet_dEta_slimjet_fatjet, null]
+         - [jet_dPhi_slimjet_fatjet, null]
+         - [jet_erel_slimjet_fatjet, null]
                   
    pf_vectors:
-      length: 128
+      length: 350
       pad_mode: wrap
       vars: 
          - [part_px, null]
@@ -118,7 +133,7 @@ inputs:
          - [part_energy, null]
          
    pf_mask:
-      length: 128
+      length: 350
       pad_mode: constant
       vars: 
          - [part_mask, null]
@@ -127,7 +142,7 @@ labels:
    ### type can be `simple`, `custom`
    ### [option 1] use `simple` for binary/multi-class classification, then `value` is a list of 0-1 labels
    type: simple
-   value: [label_hh_4b, label_tth_4b4j, label_ttbb_4b4j, label_hbb_4b, label_4b, label_2b2j]
+   value: [label_hh_4b, label_tt_2b4j, label_tth_4b4j, label_ttbb_4b4j, label_hbb_4b, label_4b, label_2b2j, label_zz_4b, label_zh_4b]
    ### [option 2] otherwise use `custom` to define the label, then `value` is a map
    # type: custom
    # value: 
@@ -145,18 +160,5 @@ observers:
    #- jet_tau3
    #- jet_tau4
 monitor_variables:
-   - part_eta
-   - part_phi
-   - part_pt
-   - part_energy
-   - jet_eta
-   - jet_phi
-   - jet_pt
-   - jet_energy
-   - event_pt
-   - event_energy
-   - event_eta
-   - event_phi
-   - part_slimjetid
-   - part_fatjetid
+
 weights:
