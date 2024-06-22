@@ -7,16 +7,11 @@ new_variables:
    ### [format] name: formula
    ### can use functions from `math`, `np` (numpy), and `awkward` in the expression
    part_mask: ak.ones_like(part_energy)
-  # part_pt: np.hypot(part_px, part_py)
    part_pt_log: np.log(part_pt)
    part_e_log: np.log(part_energy)
    part_d0: np.tanh(part_d0val)
    part_dz: np.tanh(part_dzval)
-   
    jet_pt_log: np.log(jet_pt)
-   jet_px_log: np.log(jet_px)
-   jet_py_log: np.log(jet_py)
-   jet_pz_log: np.log(jet_pz)
    jet_energy_log: np.log(jet_energy)
    jet_nparticles_log: np.log(jet_nparticles)
    jet_dR_two_jets: np.hypot(jet_dEta_two_jets, jet_dPhi_two_jets)
@@ -25,9 +20,7 @@ new_variables:
    part_dR_particle_event: np.hypot(part_dEta_particle_event, part_dPhi_particle_event)
    part_logptrel_particle_jet: np.log(part_ptrel_particle_jet)
    part_logerel_particle_jet: np.log(part_erel_particle_jet)
-   jet_logptrel_jet_event: np.log(jet_ptrel_jet_event)
    jet_logerel_jet_event: np.log(jet_erel_jet_event)
-   part_logptrel_particle_event: np.log(part_ptrel_particle_event)
    part_logerel_particle_event: np.log(part_erel_particle_event)
    
 
@@ -105,13 +98,11 @@ inputs:
          - [part_dPhi_particle_jet, null]
          - [part_dR_particle_jet, null]
          
-         - [jet_log_ptrel_jet_event, null]
          - [jet_log_erel_jet_event, null]
          - [jet_dEta_jet_event, null]
          - [jet_dPhi_jet_event, null]
          - [jet_dR_jet_event, null]
          
-         - [part_logptrel_particle_event , null]
          - [part_logerel_particle_event, null]
          - [part_dEta_particle_event, null]
          - [part_dPhi_particle_event, null]
