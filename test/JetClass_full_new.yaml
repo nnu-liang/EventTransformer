@@ -64,9 +64,9 @@ inputs:
          - [part_fatjetid, null]
          
          - [jet_pt_log, null]
-         - [jet_px_log, null]
-         - [jet_py_log, null]
-         - [jet_pz_log, null]
+         - [jet_px, null]
+         - [jet_py, null]
+         - [jet_pz, null]
          - [jet_energy_log, null]
          - [jet_sdmass, null]
          - [jet_nparticles_log, null]
