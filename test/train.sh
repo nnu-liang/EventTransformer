@@ -16,35 +16,35 @@ log_path="${WEAVER_DIR}/logs/${log_name}"
 cd  /home/lxiao/weaver-main
 python3 weaver/train.py
     --data-train \
-    "Sig_HH:${DATA_DIR_TRAIN}/sig_hh/Sig_HH*.root" \
-    "Bkg_ZZ:${DATA_DIR_TRAIN}/bkg_zz/Bkg_ZZ*.root" \
-    "Bkg_ZH:${DATA_DIR_TRAIN}/bkg_zh/Bkg_ZH*.root" \
-    "Bkg_TT:${DATA_DIR_TRAIN}/bkg_tt/Bkg_TT*.root" \
-    "Bkg_TTH:${DATA_DIR_TRAIN}/bkg_tth/Bkg_TTH*.root" \
-    "Bkg_TT2B:${DATA_DIR_TRAIN}/bkg_tt2b/Bkg_TT2B*.root" \
-    "Bkg_H2B:${DATA_DIR_TRAIN}/bkg_h2b/Bkg_H2B*.root" \
-    "Bkg_2B2J:${DATA_DIR_TRAIN}/bkg_2b2j/Bkg_2B2J*.root" \
-    "Bkg_4B:${DATA_DIR_TRAIN}/bkg_4b/Bkg_4B*.root" \
+    "Sig_HH:${DATA_DIR_TRAIN}/sig_hh_EvenTF/Sig_HH*.root" \
+    "Bkg_ZZ:${DATA_DIR_TRAIN}/bkg_zz_EvenTF/Bkg_ZZ*.root" \
+    "Bkg_ZH:${DATA_DIR_TRAIN}/bkg_zh_EvenTF/Bkg_ZH*.root" \
+    "Bkg_TT:${DATA_DIR_TRAIN}/bkg_tt_EvenTF/Bkg_TT*.root" \
+    "Bkg_TTH:${DATA_DIR_TRAIN}/bkg_tth_EvenTF/Bkg_TTH*.root" \
+    "Bkg_TT2B:${DATA_DIR_TRAIN}/bkg_tt2b_EvenTF/Bkg_TT2B*.root" \
+    "Bkg_H2B:${DATA_DIR_TRAIN}/bkg_h2b_EvenTF/Bkg_H2B*.root" \
+    "Bkg_2B2J:${DATA_DIR_TRAIN}/bkg_2b2j_EvenTF/Bkg_2B2J*.root" \
+    "Bkg_4B:${DATA_DIR_TRAIN}/bkg_4b_EvenTF/Bkg_4B*.root" \
     --data-val \
-    "Sig_HH:${DATA_DIR_VAL}/sig_hh/Sig_HH*.root" \
-    "Bkg_ZZ:${DATA_DIR_VAL}/bkg_zz/Bkg_ZZ*.root" \
-    "Bkg_ZH:${DATA_DIR_VAL}/bkg_zh/Bkg_ZH*.root" \
-    "Bkg_TT:${DATA_DIR_VAL}/bkg_tt/Bkg_TT*.root" \
-    "Bkg_TTH:${DATA_DIR_VAL}/bkg_tth/Bkg_TTH*.root" \
-    "Bkg_TT2B:${DATA_DIR_VAL}/bkg_tt2b/Bkg_TT2B*.root" \
-    "Bkg_H2B:${DATA_DIR_VAL}/bkg_h2b/Bkg_H2B*.root" \
-    "Bkg_2B2J:${DATA_DIR_VAL}/bkg_2b2j/Bkg_2B2J*.root" \
-    "Bkg_4B:${DATA_DIR_VAL}/bkg_4b/Bkg_4B*.root" \
+    "Sig_HH:${DATA_DIR_VAL}/sig_hh_EvenTF/Sig_HH*.root" \
+    "Bkg_ZZ:${DATA_DIR_VAL}/bkg_zz_EvenTF/Bkg_ZZ*.root" \
+    "Bkg_ZH:${DATA_DIR_VAL}/bkg_zh_EvenTF/Bkg_ZH*.root" \
+    "Bkg_TT:${DATA_DIR_VAL}/bkg_tt_EvenTF/Bkg_TT*.root" \
+    "Bkg_TTH:${DATA_DIR_VAL}/bkg_tth_EvenTF/Bkg_TTH*.root" \
+    "Bkg_TT2B:${DATA_DIR_VAL}/bkg_tt2b_EvenTF/Bkg_TT2B*.root" \
+    "Bkg_H2B:${DATA_DIR_VAL}/bkg_h2b_EvenTF/Bkg_H2B*.root" \
+    "Bkg_2B2J:${DATA_DIR_VAL}/bkg_2b2j_EvenTF/Bkg_2B2J*.root" \
+    "Bkg_4B:${DATA_DIR_VAL}/bkg_4b_EvenTF/Bkg_4B*.root" \
     --data-test \
-    "Sig_HH:${DATA_DIR_TEST}/sig_hh/Sig_HH*.root" \
-    "Bkg_ZZ:${DATA_DIR_TEST}/bkg_zz/Bkg_ZZ*.root" \
-    "Bkg_ZH:${DATA_DIR_TEST}/bkg_zh/Bkg_ZH*.root" \
-    "Bkg_TT:${DATA_DIR_TEST}/bkg_tt/Bkg_TT*.root" \
-    "Bkg_TTH:${DATA_DIR_TEST}/bkg_tth/Bkg_TTH*.root" \
-    "Bkg_TT2B:${DATA_DIR_TEST}/bkg_tt2b/Bkg_TT2B*.root" \
-    "Bkg_H2B:${DATA_DIR_TEST}/bkg_h2b/Bkg_H2B*.root" \
-    "Bkg_2B2J:${DATA_DIR_TEST}/bkg_2b2j/Bkg_2B2J*.root" \
-    "Bkg_4B:${DATA_DIR_TEST}/bkg_4b/Bkg_4B*.root" \
+    "Sig_HH:${DATA_DIR_TEST}/sig_hh_EvenTF/Sig_HH*.root" \
+    "Bkg_ZZ:${DATA_DIR_TEST}/bkg_zz_EvenTF/Bkg_ZZ*.root" \
+    "Bkg_ZH:${DATA_DIR_TEST}/bkg_zh_EvenTF/Bkg_ZH*.root" \
+    "Bkg_TT:${DATA_DIR_TEST}/bkg_tt_EvenTF/Bkg_TT*.root" \
+    "Bkg_TTH:${DATA_DIR_TEST}/bkg_tth_EvenTF/Bkg_TTH*.root" \
+    "Bkg_TT2B:${DATA_DIR_TEST}/bkg_tt2b_EvenTF/Bkg_TT2B*.root" \
+    "Bkg_H2B:${DATA_DIR_TEST}/bkg_h2b_EvenTF/Bkg_H2B*.root" \
+    "Bkg_2B2J:${DATA_DIR_TEST}/bkg_2b2j_EvenTF/Bkg_2B2J*.root" \
+    "Bkg_4B:${DATA_DIR_TEST}/bkg_4b_EvenTF/Bkg_4B*.root" \
     --data-config $data_config \
     --network-config $network_config \
     --model-prefix $model_prefix \
