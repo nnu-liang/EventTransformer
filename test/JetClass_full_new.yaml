@@ -16,10 +16,13 @@ new_variables:
    jet_nparticles_log: np.log(jet_nparticles)
    jet_dR_two_jets: np.hypot(jet_dEta_two_jets, jet_dPhi_two_jets)
    jet_dR_jet_event: np.hypot(jet_dEta_jet_event, jet_dPhi_jet_event)
-   part_dR_particle_jet: np.hypot(part_dEta_particle_jet, part_dPhi_particle_jet)
+   part_dR_particle_slimjet: np.hypot(part_dEta_particle_slimjet, part_dPhi_particle_slimjet)
+   part_dR_particle_fatjet: np.hypot(part_dEta_particle_fatjet, part_dPhi_particle_fatjet)
    part_dR_particle_event: np.hypot(part_dEta_particle_event, part_dPhi_particle_event)
-   part_logptrel_particle_jet: np.log(part_ptrel_particle_jet)
-   part_logerel_particle_jet: np.log(part_erel_particle_jet)
+   part_logptrel_particle_slimjet: np.log(part_ptrel_particle_slimjet)
+   part_logptrel_particle_fatjet: np.log(part_ptrel_particle_fatjet)
+   part_logerel_particle_slimjet: np.log(part_erel_particle_slimjet)
+   part_logerel_particle_fatjet: np.log(part_erel_particle_fatjet)
    jet_logerel_jet_event: np.log(jet_erel_jet_event)
    part_logerel_particle_event: np.log(part_erel_particle_event)
    
@@ -35,8 +38,10 @@ inputs:
       length: 350
       pad_mode: wrap
       vars:
-         - [part_dEta_particle_jet, null]
-         - [part_dPhi_particle_jet, null]
+         - [part_dEta_particle_slimjet, null]
+         - [part_dEta_particle_fatjet, null]
+         - [part_dPhi_particle_slimjet, null]
+         - [part_dPhi_particle_fatjet, null]
    pf_features:
       length: 350
       pad_mode: wrap
@@ -83,7 +88,6 @@ inputs:
          - [event_px, null]
          - [event_py, null]
          - [event_pz, null]
-         - [event_pt, null]
          - [event_energy, null]
          - [event_nparticles, null]
          - [event_njets, null]
@@ -92,11 +96,16 @@ inputs:
          - [jet_dPhi_two_jets, null]
          - [jet_dR_two_jets, null]
          
-         - [part_logptrel_particle_jet, null]
-         - [part_logerel_particle_jet, null]
-         - [part_dEta_particle_jet, null]
-         - [part_dPhi_particle_jet, null]
-         - [part_dR_particle_jet, null]
+         - [part_logptrel_particle_slimjet, null]
+         - [part_logerel_particle_slimjet, null]
+         - [part_dEta_particle_slimjet, null]
+         - [part_dPhi_particle_slimjet, null]
+         - [part_dR_particle_slimjet, null]
+         - [part_logptrel_particle_fatjet, null]
+         - [part_logerel_particle_fatjet, null]
+         - [part_dEta_particle_fatjet, null]
+         - [part_dPhi_particle_fatjet, null]
+         - [part_dR_particle_fatjet, null]
          
          - [jet_log_erel_jet_event, null]
          - [jet_dEta_jet_event, null]
