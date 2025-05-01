@@ -245,10 +245,10 @@ class Embed(nn.Module):
             ])
             input_dim = dim
         self.embed = nn.Sequential(*module_list)
-
     def forward(self, x):
         if self.input_bn is not None:
             # x: (batch, embed_dim, seq_len)
+            #print("x.shape before embed =", x.shape)
             x = self.input_bn(x)
             x = x.permute(2, 0, 1).contiguous()
         # x: (seq_len, batch, embed_dim)
@@ -258,13 +258,14 @@ class Embed(nn.Module):
 class PairEmbed(nn.Module):
     def __init__(
             self, pairwise_lv_dim, pairwise_input_dim, dims,
-            remove_self_pair=False, use_pre_activation_pair=True, mode='sum',
+            remove_self_pair=False, use_pre_activation_pair=True, mode='concat',
             normalize_input=True, activation='gelu', eps=1e-8,
             for_onnx=False):
         super().__init__()
 
         self.pairwise_lv_dim = pairwise_lv_dim
-        self.pairwise_input_dim = pairwise_input_dim
+        #self.pairwise_input_dim = pairwise_input_dim
+        self.pairwise_input_dim = 1
         self.is_symmetric = (pairwise_lv_dim <= 5) and (pairwise_input_dim == 0)
         self.remove_self_pair = remove_self_pair
         self.mode = mode
@@ -273,7 +274,7 @@ class PairEmbed(nn.Module):
         self.out_dim = dims[-1]
 
         if self.mode == 'concat':
-            input_dim = pairwise_lv_dim + pairwise_input_dim
+            input_dim = pairwise_lv_dim + 1#pairwise_input_dim
             module_list = [nn.BatchNorm1d(input_dim)] if normalize_input else []
             for dim in dims:
                 module_list.extend([
@@ -319,10 +320,12 @@ class PairEmbed(nn.Module):
     def forward(self, x, uu=None):
         # x: (batch, v_dim, seq_len)
         # uu: (batch, v_dim, seq_len, seq_len)
+        #print(f"[PairEmbed] pairwise_lv_dim = {self.pairwise_lv_dim}, pairwise_input_dim = {self.pairwise_input_dim}")
         assert (x is not None or uu is not None)
         with torch.no_grad():
             if x is not None:
                 batch_size, _, seq_len = x.size()
+        #        print("x.shape1:", x.shape)
             else:
                 batch_size, _, seq_len, _ = uu.size()
             if self.is_symmetric and not self.for_onnx:
@@ -333,9 +336,12 @@ class PairEmbed(nn.Module):
                     xi = x[:, :, i, j]  # (batch, dim, seq_len*(seq_len+1)/2)
                     xj = x[:, :, j, i]
                     x = self.pairwise_lv_fts(xi, xj)
+        #            print("x.shape2:", x.shape)
                 if uu is not None:
+        #            print("uu.shape1:", uu.shape)
                     # (batch, dim, seq_len*(seq_len+1)/2)
                     uu = uu[:, :, i, j]
+        #            print("uu.shape2:", uu.shape)
             else:
                 if x is not None:
                     x = self.pairwise_lv_fts(x.unsqueeze(-1), x.unsqueeze(-2))
@@ -354,6 +360,7 @@ class PairEmbed(nn.Module):
                     pair_fts = torch.cat((x, uu), dim=1)
 
         if self.mode == 'concat':
+    #        print("pair_fts.shape =", pair_fts.shape)
             elements = self.embed(pair_fts)  # (batch, embed_dim, num_elements)
         elif self.mode == 'sum':
             if x is None:

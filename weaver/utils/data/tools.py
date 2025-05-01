@@ -58,6 +58,73 @@ def _repeat_pad(a, maxlen, shuffle=False, dtype='float32'):
     return ak.values_astype(x, dtype)
 
 
+def _pad_4d(a, maxlen, value=0, dtype='float32'):
+    """Pad a 4D tensor (batch, features, p, p) to (batch, features, maxlen, maxlen), supporting Awkward and NumPy."""
+
+    if isinstance(a, ak.Array):
+        a = ak.pad_none(a, maxlen, axis=1, clip=True)
+        a = ak.pad_none(a, maxlen, axis=2, clip=True)
+        a = ak.fill_none(a, value)
+        a = ak.values_astype(a, dtype)
+        return ak.to_numpy(a)
+
+
+def _repeat_pad_4d(a, maxlen, shuffle=False, dtype='float32'):
+    """Repeat pad a 4D tensor to a specified maximum length.
+    
+    Args:
+        a: Input tensor of shape (batch_size, features, particles, particles)
+        maxlen: Target length for the particle dimensions
+        shuffle: Whether to shuffle the repeated elements
+        dtype: Output dtype
+    """
+    if isinstance(a, np.ndarray):
+        if a.ndim == 4 and a.shape[2] == maxlen and a.shape[3] == maxlen:
+            return a
+            
+        # Flatten the particle dimensions
+        flat = a.reshape(a.shape[0], a.shape[1], -1)
+        
+        # Calculate how many times to repeat
+        repeat_times = int(np.ceil(maxlen * maxlen / flat.shape[2]))
+        x = np.tile(flat, (1, 1, repeat_times))
+        
+        # Reshape back to 4D
+        x = x[:, :, :maxlen * maxlen].reshape(a.shape[0], a.shape[1], maxlen, maxlen)
+        
+        # Create mask for original data
+        mask = np.zeros((a.shape[0], a.shape[1], maxlen, maxlen), dtype=bool)
+        mask[:, :, :a.shape[2], :a.shape[2]] = True
+        
+        # Combine original and repeated data
+        x_orig = _pad_4d(a, maxlen, value=0, dtype=dtype)
+        x = x_orig + (~mask) * x
+        
+        return x.astype(dtype)
+    else:
+        raise ValueError("Input must be a numpy array")
+
+
+def auto_pad_with_mode(a, maxlen, params):
+    """Pad a 4D tensor using the specified mode.
+
+    Args:
+        a: Input tensor, either numpy.ndarray or awkward.Array (converted beforehand)
+        maxlen: Target length for P and P
+        params: Dictionary with keys:
+            - 'pad_mode': 'wrap' or 'constant'
+            - 'pad_value': used if pad_mode == 'constant'
+    """
+    pad_mode = params['pad_mode']
+
+    if pad_mode == 'wrap':
+        return _repeat_pad_4d(a, maxlen)
+    elif pad_mode == 'constant':
+        return _pad_4d(a, maxlen, value=params['pad_value'])
+    else:
+        raise ValueError(f"Unsupported pad_mode: {pad_mode}")
+
+
 def _clip(a, a_min, a_max):
     if isinstance(a, np.ndarray) or a.ndim == 1:
         return np.clip(a, a_min, a_max)

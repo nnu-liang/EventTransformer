@@ -12,13 +12,25 @@ class ParticleTransformerWrapper(torch.nn.Module):
     def __init__(self, **kwargs) -> None:
         super().__init__()
         self.mod = ParticleTransformer(**kwargs)
+        self.attention_matrix = None
+        self.interactionMatrix = None
+        self.pre_mask_attention_matrices = []
 
     @torch.jit.ignore
     def no_weight_decay(self):
         return {'mod.cls_token', }
 
-    def forward(self, points, features, lorentz_vectors, mask):
-        return self.mod(features, v=lorentz_vectors, mask=mask)
+    def forward(self, points, features, lorentz_vectors, mask, interaction):
+        output = self.mod(features, v=lorentz_vectors, mask=mask, uu=interaction)
+        self.attention_matrix = self.mod.getAttention()
+        self.interactionMatrix = self.mod.getInteraction()
+        #self.pre_mask_attention_matrices = self.get_pre_mask_attention_matrices()
+        return output
+    def get_attention_matrix(self):
+        return self.attention_matrix
+
+    def get_interactionMatrix(self):
+        return self.interactionMatrix
 
 
 def get_model(data_config, **kwargs):

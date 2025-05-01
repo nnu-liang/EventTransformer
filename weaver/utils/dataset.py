@@ -10,7 +10,7 @@ import torch.utils.data
 from functools import partial
 from concurrent.futures.thread import ThreadPoolExecutor
 from .logger import _logger
-from .data.tools import _pad, _repeat_pad, _clip, _stack
+from .data.tools import _pad, _repeat_pad, _clip, _stack, _pad_4d, _repeat_pad_4d, auto_pad_with_mode
 from .data.fileio import _read_files
 from .data.config import DataConfig, _md5
 from .data.preprocess import _apply_selection, _build_new_variables, _build_weights, AutoStandardizer, WeightMaker
@@ -36,8 +36,25 @@ def _finalize_inputs(table, data_config):
         if params['center'] is not None:
             table[k] = _clip((table[k] - params['center']) * params['scale'], params['min'], params['max'])
         if params['length'] is not None:
-            pad_fn = _repeat_pad if params['pad_mode'] == 'wrap' else partial(_pad, value=params['pad_value'])
-            table[k] = pad_fn(table[k], params['length'])
+            #pad_fn = _repeat_pad if params['pad_mode'] == 'wrap' else partial(_pad, value=params['pad_value'])
+            #table[k] = pad_fn(table[k], params['length'])
+            is_4d = False
+            if isinstance(table[k], ak.Array):
+                layout = ak.to_layout(table[k], allow_other=True)
+                #print(f"[DEBUG] {k} purelist_depth =", layout.purelist_depth)
+                if hasattr(layout, "form") and layout.purelist_depth == 3:
+                    is_4d = True
+
+            #if k == 'part_matrix':
+            #    print("[DEBUG] part_matrix detected")
+            #    print("    is_4d =", is_4d)
+            #    print("    type =", type(table[k]))
+    
+            if is_4d:
+                table[k] = auto_pad_with_mode(table[k], params['length'], params)
+            else:
+                pad_fn = _repeat_pad if params['pad_mode'] == 'wrap' else partial(_pad, value=params['pad_value'])
+                table[k] = pad_fn(table[k], params['length'])
         # check for NaN
         if np.any(np.isnan(table[k])):
             _logger.warning(
