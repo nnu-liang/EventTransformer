@@ -76,7 +76,7 @@ def p3_norm(p, eps=1e-8):
     return p[:, :3] / p[:, :3].norm(dim=1, keepdim=True).clamp(min=eps)
 
 
-def pairwise_lv_fts(xi, xj, num_outputs=5, eps=1e-8, for_onnx=False):
+def pairwise_lv_fts(xi, xj, num_outputs=8, eps=1e-8, for_onnx=False):
     # pti, rapi, phii = to_ptrapphim(xi, False, eps=None, for_onnx=for_onnx).split((1, 1, 1), dim=1)
     # ptj, rapj, phij = to_ptrapphim(xj, False, eps=None, for_onnx=for_onnx).split((1, 1, 1), dim=1)
     pti, rapi, phii = to_ptrapphim(xi[:, :4], False, eps=eps, for_onnx=for_onnx).split((1, 1, 1), dim=1)
@@ -103,16 +103,28 @@ def pairwise_lv_fts(xi, xj, num_outputs=5, eps=1e-8, for_onnx=False):
         outputs.append(delta_eta)
 
     if num_outputs > 5:
+        Delta_phi = delta_phi(xi[:, 5:6], xj[:, 5:6])
+        outputs.append(Delta_phi)
+
+    if num_outputs > 6:
+        ptrel = xi[:, 6:7]/xj[:, 6:7]
+        outputs.append(ptrel)
+    
+    if num_outputs > 7:
+        erel = xi[:, 7:8]/xj[:, 7:8]
+        outputs.append(erel)
+
+    if num_outputs > 8:
         lnds2 = torch.log(torch.clamp(-to_m2(xi - xj, eps=None), min=eps))
         outputs.append(lnds2)
 
     # the following features are not symmetric for (i, j)
-    if num_outputs > 6:
+    if num_outputs > 9:
         xj_boost = boost(xj, xij)
         costheta = (p3_norm(xj_boost, eps=eps) * p3_norm(xij, eps=eps)).sum(dim=1, keepdim=True)
         outputs.append(costheta)
 
-    if num_outputs > 7:
+    if num_outputs > 10:
         deltarap = rapi - rapj
         deltaphi = delta_phi(phii, phij)
         outputs += [deltarap, deltaphi]
