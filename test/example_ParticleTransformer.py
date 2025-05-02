@@ -39,7 +39,7 @@ def get_model(data_config, **kwargs):
         input_dim=len(data_config.input_dicts['pf_features']),
         num_classes=len(data_config.label_value),
         # network configurations
-        pair_input_dim=4,
+        pair_input_dim=5,
         use_pre_activation_pair=False,
         embed_dims=[128, 512, 128],
         pair_embed_dims=[64, 64, 64],
