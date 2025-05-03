@@ -70,6 +70,7 @@ def _finalize_inputs(table, data_config):
     for k in data_config.z_variables:
         if k in data_config.monitor_variables:
             output[k] = table[k]  # ak.Array
+    output['_pf_interaction'] = np.nan_to_num(output['_pf_interaction'])
     return output
 
 
