@@ -345,9 +345,9 @@ class PairEmbed(nn.Module):
         # uu: (batch, v_dim, seq_len, seq_len)
         #print(f"[PairEmbed] pairwise_lv_dim = {self.pairwise_lv_dim}, pairwise_input_dim = {self.pairwise_input_dim}")
         assert (x is not None or uu is not None)
-        ob_slimjetid = x[:, 0:1, :]  # shape: (B, 1, N)
-        ob_fatjetid  = x[:, 1:2, :]
-        ob_isPorJ    = x[:, 2:3, :]
+        ob_slimjetid = x[:, -3:-2, :]  # shape: (B, 1, N)
+        ob_fatjetid  = x[:, -2:-1, :]
+        ob_isPorJ    = x[:, -1:, :]
 
         slim_i = ob_slimjetid.transpose(1, 2)  # (B, N, 1)
         slim_j = ob_slimjetid                  # (B, 1, N)
