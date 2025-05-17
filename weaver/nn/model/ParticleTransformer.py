@@ -292,7 +292,7 @@ class PairEmbed(nn.Module):
         self.out_dim = dims[-1]
 
         if self.mode == 'concat':
-            input_dim = pairwise_lv_dim + 1#pairwise_input_dim
+            input_dim = pairwise_lv_dim #+ 1#pairwise_input_dim
             module_list = [nn.BatchNorm1d(input_dim)] if normalize_input else []
             for dim in dims:
                 module_list.extend([
@@ -304,6 +304,11 @@ class PairEmbed(nn.Module):
             if use_pre_activation_pair:
                 module_list = module_list[:-1]
             self.embed = nn.Sequential(*module_list)
+            self.embed_contain = nn.Sequential(
+                nn.BatchNorm2d(1) if normalize_input else nn.Identity(),
+                nn.Conv2d(1, 1, kernel_size=1),
+                nn.GELU() if activation == 'gelu' else nn.ReLU(),
+            )
         elif self.mode == 'sum':
             if pairwise_lv_dim > 0:
                 input_dim = pairwise_lv_dim
@@ -340,6 +345,29 @@ class PairEmbed(nn.Module):
         # uu: (batch, v_dim, seq_len, seq_len)
         #print(f"[PairEmbed] pairwise_lv_dim = {self.pairwise_lv_dim}, pairwise_input_dim = {self.pairwise_input_dim}")
         assert (x is not None or uu is not None)
+        ob_slimjetid = x[:, 0:1, :]  # shape: (B, 1, N)
+        ob_fatjetid  = x[:, 1:2, :]
+        ob_isPorJ    = x[:, 2:3, :]
+
+        slim_i = ob_slimjetid.transpose(1, 2)  # (B, N, 1)
+        slim_j = ob_slimjetid                  # (B, 1, N)
+
+        fat_i = ob_fatjetid.transpose(1, 2)
+        fat_j = ob_fatjetid
+
+        type_i = ob_isPorJ.transpose(1, 2)
+        type_j = ob_isPorJ
+
+        cond_slim = (slim_i == slim_j) & (slim_i != -1)
+        cond_fat  = (fat_i == fat_j) & (fat_i != -1)
+        cond_jet_match = cond_slim | cond_fat  # shape: (B, N, N)
+
+        cond_type = (type_i == 0) & (type_j == 1)
+
+        contain_mask = (cond_jet_match & cond_type).float()  # shape: (B, N, N)
+        contain_mask = contain_mask.unsqueeze(1)             # shape: (B, 1, N, N)
+        contain_embed = self.embed_contain(contain_mask)  # → (B, D_embed, N, N)
+
         with torch.no_grad():
             if x is not None:
                 batch_size, _, seq_len = x.size()
@@ -392,6 +420,7 @@ class PairEmbed(nn.Module):
             y = torch.zeros(batch_size, self.out_dim, seq_len, seq_len, dtype=elements.dtype, device=elements.device)
             y[:, :, i, j] = elements
             y[:, :, j, i] = elements
+            y = torch.cat([y, contain_embed], dim=1)
         else:
             y = elements.view(-1, self.out_dim, seq_len, seq_len)
         return y
