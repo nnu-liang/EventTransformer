@@ -20,8 +20,8 @@ class ParticleTransformerWrapper(torch.nn.Module):
     def no_weight_decay(self):
         return {'mod.cls_token', }
 
-    def forward(self, points, features, lorentz_vectors, mask, interaction):
-        output = self.mod(features, v=lorentz_vectors, mask=mask, uu=interaction)
+    def forward(self, points, features, lorentz_vectors, mask):#, interaction):
+        output = self.mod(features, v=lorentz_vectors, mask=mask)#, uu=interaction)
         self.attention_matrix = self.mod.getAttention()
         self.interactionMatrix = self.mod.getInteraction()
         #self.pre_mask_attention_matrices = self.get_pre_mask_attention_matrices()
