@@ -292,6 +292,7 @@ class PairEmbed(nn.Module):
         self.out_dim = dims[-1]
 
         if self.mode == 'concat':
+            dims = [7]
             input_dim = pairwise_lv_dim #+ 1#pairwise_input_dim
             module_list = [nn.BatchNorm1d(input_dim)] if normalize_input else []
             for dim in dims:
@@ -417,7 +418,8 @@ class PairEmbed(nn.Module):
                 elements = self.embed(x) + self.fts_embed(uu)
 
         if self.is_symmetric and not self.for_onnx:
-            y = torch.zeros(batch_size, self.out_dim, seq_len, seq_len, dtype=elements.dtype, device=elements.device)
+            # y = torch.zeros(batch_size, self.out_dim, seq_len, seq_len, dtype=elements.dtype, device=elements.device)
+            y = torch.zeros(batch_size, 7, seq_len, seq_len, dtype=elements.dtype, device=elements.device)
             y[:, :, i, j] = elements
             y[:, :, j, i] = elements
             y = torch.cat([y, contain_embed], dim=1)
